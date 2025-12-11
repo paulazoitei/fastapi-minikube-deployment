@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Query,HTTPException
-from services.random_service import generate_random_number,generate_random_between
+from app.services.random_service import RandomService
 from typing import Annotated
 
 router=APIRouter(
@@ -11,7 +11,7 @@ router=APIRouter(
 async def get_random_number(max_value:int):
     return{
         "max":max_value,
-        "random_number":generate_random_number(max_value)
+        "random_number":RandomService.generate_random_number(max_value)
     }
 
 @router.get("/between")
@@ -30,7 +30,7 @@ async def get_random_between(
     )] = 99,
 ):
     try:
-        random_number = generate_random_between(min_value, max_value)
+        random_number = RandomService.generate_random_between(min_value, max_value)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 

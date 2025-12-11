@@ -3,9 +3,9 @@ from pydantic import BaseModel,Field
 
 class Item(BaseModel):
     name:str=Field(
-        min_lentgh=1,
+        min_length=1,
         max_length=100,
-        descripition="The item name"
+        description="The item name"
     )
 
 class ItemResponse(BaseModel):
