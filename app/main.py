@@ -3,23 +3,39 @@ from typing import Annotated
 from fastapi import FastAPI,HTTPException, Query
 from schemas.item import Item,ItemResponse,ItemListResponse,ItemUpdateResponse,ItemDeleteResponse
 
-app=FastAPI()
 
-items_db=["bla"]
+tags_metadata=[
+    {
+        "name":"Random Playground",
+        "description":"Generate random numbers",
+    },
+    {
+        "name":"Random Items Management",
+        "description":"Create, shuffle, read, update and delete items",
+    },
+]
+app=FastAPI(
+    title="Randomizer API",
+    description="Shuffle lists, pick random items, and generate random numbers.",
+    version="1.0.0",
+    openapi_tags=tags_metadata,
+)
 
-@app.get("/")
-def Home():
+items_db=["random_number"]
+
+@app.get("/",tags=["Random Playground"])
+async def Home():
     return {"message":"Welcome to the Randomizer API"}
 
-@app.get("/random/{max_value}")
-def get_random_number(max_value: int):
+@app.get("/random/{max_value}",tags=["Random Playground"])
+async def get_random_number(max_value: int):
     return{
         "max": max_value,
         "random_number":random.randint(1,max_value)
     }
 
-@app.get("/random-between")
-def get_random_between(
+@app.get("/random-between",tags=["Random Playground"])
+async def get_random_between(
         min_value: Annotated[int,Query(
             title="Minimum Value",
             descripiton="The minimum random number",
@@ -42,8 +58,8 @@ def get_random_between(
         "random_number":random.randint(min_value,max_value)
     }
 
-@app.post("/items",response_model=ItemResponse)
-def add_item(item:Item):
+@app.post("/items",response_model=ItemResponse,tags=["Random Items Management"])
+async def add_item(item:Item):
     
     if item.name in items_db:
         raise HTTPException(status_code=400,detail ="Item already exists")
@@ -55,8 +71,8 @@ def add_item(item:Item):
 
     )
 
-@app.get("/items",response_model=ItemListResponse)
-def get_randomized_items():
+@app.get("/items",response_model=ItemListResponse,tags=["Random Items Management"])
+async def get_randomized_items():
     randomized=items_db.copy()
     random.shuffle(randomized)
     return ItemListResponse(
@@ -65,8 +81,8 @@ def get_randomized_items():
         count=len(items_db)
     )
 
-@app.put("/items/{update_item_name}",response_model=ItemUpdateResponse)
-def update_item(update_item_name:str, item:Item):
+@app.put("/items/{update_item_name}",response_model=ItemUpdateResponse,tags=["Random Items Management"])
+async def update_item(update_item_name:str, item:Item):
     if update_item_name not in items_db:
         raise HTTPException(status_code=404,detail="Item not found")
     
@@ -86,8 +102,8 @@ def update_item(update_item_name:str, item:Item):
         new_item=item.name
     )
 
-@app.delete("/items/{item}",response_model=ItemDeleteResponse)
-def delete_item(item:str):
+@app.delete("/items/{item}",response_model=ItemDeleteResponse,tags=["Random Items Management"])
+async def delete_item(item:str):
     
     if item not in items_db:
         raise HTTPException(status_code=404,detail ="Item not found")
