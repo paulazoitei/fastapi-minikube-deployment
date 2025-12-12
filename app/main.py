@@ -3,6 +3,14 @@ from fastapi import FastAPI
 from app.routers.home_router import router as home_router
 from app.routers.item_router import router as item_router
 from app.routers.random_router import router as random_router
+from app.logging.config import setup_logging
+import logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
+
+logger.info("Starting FastAPI application...")
+
 tags_metadata=[
     {
         "name":"Random Playground",
@@ -13,6 +21,7 @@ tags_metadata=[
         "description":"Create, shuffle, read, update and delete items",
     },
 ]
+
 app=FastAPI(
     title="Randomizer API",
     description="Shuffle lists, pick random items, and generate random numbers.",
@@ -25,3 +34,5 @@ app=FastAPI(
 app.include_router(home_router)
 app.include_router(item_router)
 app.include_router(random_router)
+
+logger.info("Routers successfully registered.")
